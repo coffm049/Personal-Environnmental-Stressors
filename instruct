@@ -1,0 +1,15 @@
+#!/bin/bash
+# Name: 	Instruct
+# Purpose:	This compiles all of the function necessary to create the survey and execute it in one file. 
+# Updated: 	10/29/2018 CC
+
+
+bash background/survey
+Rscript background/combiner.R
+
+
+cut -d , -f 1 --complement data_folder/data > data_folder/data2
+sed -i 's/"//g' data_folder/data2
+sed -i 's/,/ /g' data_folder/data2
+mv data_folder/data2 data_folder/data
+rm data_folder/temp_file

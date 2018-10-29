@@ -1,0 +1,32 @@
+#!bin/bash
+
+# Name: 	Environmental Stressors/Variables
+# Purpose:	To house all of the variables being tracked by the Stressors survey in a way that is easily accessible to edit.
+# Suggestion: 	Edit this to add new variables. This file does not run anything just simply serves as a source.
+# Updated:	2018/10/23
+
+# Variables under consideration. The variables are organized into arrays based on the type of data I expect to describe them
+
+# scale       -- is the 1-10 scale used for evaluation of dependent variables
+# yn_array    -- the responses for yes or no questions for consistency of entry.
+
+yn_array=("Yes" "No")
+scale=(`seq 10`)
+
+# yntime_vars    -- activities that can be described by a yes or no followed by the start and end time. Quality is not considered 
+# because generally I bring a pretty high intensity to everything I do. :P
+# ex_list     -- lists the different types of exercises I consider and will be input into the exercise column.
+# dep_vars    -- the variables I'm hoping to see trends with because these are ultimately what matters. They are subjective responses
+# and are judged on a 1-10 scale.
+# events_array-- a list of other events that occur in a day that would effect the dependent variables. Some leaway is offered with
+# the 'other' option. These events are seen to be valued for there accomplishment rather than the time spent doing them.
+# scale       -- is the 1-10 scale used for evaluation of dependent variables
+# yn_array    -- the responses for yes or no questions for consistency of entry.
+
+dep_vars=("Happiness" "Fulfillment" "Sociability" "Productivity")
+yntime_vars=("Sleep" "Work" "Read" "Music" "Create" "Study" "Drink" "Code" "Internet" "Meditate")
+ex_list=("Weights" "Run" "Bike" "Swim" "Dance" "Stretch")
+events_array=("Party" "Family" "Fight" "Bad_feedback" "Good_feedback" "Accident" "Show_concert" "Finish_project" "Travel" "Good Deed")
+# Foods lists
+foods=("Greek_yogurt" "Frozen_berries" "Banana" "Apple" "Orange" "Grapefruit" "Salad" "Protein_bar" "PB_sandwich" "Pizza" "Mixed_nuts" "Salmon" "Tuna" "Sushi" "Chinese_food" "Huel" "Pasta" "Chicken")
+

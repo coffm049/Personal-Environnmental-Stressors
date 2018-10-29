@@ -1,0 +1,181 @@
+#!/bin/bash
+# Name: 	Environmental Stressors/Survey
+# Purpose:	Take the list of variables from the variables file and create the survey questions as well as create the data 
+# 		for entry into the end data file.
+# Updated:  	2018/10/29 CC
+
+
+source background/variables
+
+# The layout of this study will be like a survey. The idea is to make entering the data as convenient as possible so that I'm
+# more likely to enter the data in the first place. Different questions treat the data differently for instance simple 
+# stressors are simple yes or no questions with the associated amount of time for yes answers whereas other activities 
+# require a continuous variable such as diet and sleep.
+
+################### Development status #####################################################################################
+# Current features
+# 1. Interactive user choices
+# 2. Binary entries for activities that include a follow-up time length question
+# 3. Factor entries for activities that have multiple options (i.e. exercise)
+# 4. Log for time of entry
+# 5. Diet
+# 	a. Log mealtimes by the timestamp
+#	b. Log what eaten for meal
+# 	c. Log water intake
+# 6. Logs work hours
+# 7. Logs sleep hours
+
+# To do:
+# 1. Develop a sleep section
+# 	a. Log 'to sleep' (for the prior night) and wake up times
+# 	b. Consider entering data from sleep cycle
+# 2. Develop a diet section
+#	a. Log calorie count
+# 	b. How should I get nutritional information from this?
+#	c. perhaps I could use life sum, just take the values they report for my values
+# 	d. alphabetize the food array
+#       e. Create a response from unknown entries that automatically updates the foods array to include it and prompt user 
+#          for life sum nutrition facts.i
+#       f. Set up nutrition table from Life sum
+# 3. Make either a desktop icon or make the script run on wakeup.
+# 4. A feature for editing or erasing messed up entries.
+
+# Design considerations:
+# 1. Currently, exercise is treated as a factor variable which in essense would report a binary yes or no to did you exercise
+# and if you answer yes, it then asks what kind and for how long. The question is whether to include all of these exercises 
+# in the binary variables questions. Here is are the ad- and dis- advantages of changing the exercises into the binary section.
+# Advantages: Shorter code, only one position to add activities, can account for more than one activity
+# Disadvantages: The width of the data set increases by a column everytime a new exercise is introduced, wouldn't be able to 
+# determine how much time was spent on each individual exercise if multiple were done within a day.
+# 2. The quality of the activity is not considered because I generally bring a pretty high intensity to everything I do, maybe
+# it'd be worth recording that though.
+# 3. For diet, I only ask what have you eaten since the last entry today. This will be more general than asking about each
+# individual meal and the meal can be inferred from the time of day anyway.
+# 4. Questions will be asked in the form of "Have you ____ since the last entry?" This way I'm effectively measuring the 
+# differential signal which by virtue of leading to integrated forms will contain less noise.
+# 5. Splitting the file into multiple smaller files and having the appender compile them all into one file.
+# 6. Make different files for different times of day. For instance it might be annoying always specifying that I haven't slept since.
+############################################################################################################################
+
+addrow=()
+### Independent variables
+# Update the file with the day of the week as well as the time of year and time of day
+# date '+%A: %Y-%m-%d %H:%M' >> Time
+
+# Update the file with the day of the week as well as the time of year and time of day
+addrow+=(`date "+%A:%Y-%m-%d.%H:%M"`)
+
+### Dependent Variables
+# The dependent variables are completely emotional and are thus entirely graded on a 1-10 scale.
+for feel in ${dep_vars[@]}
+do
+        echo "Rate your $feel on a scale from 1-10. (1= absolute worst, 5= average day, 10 = best ever)"
+        select intense in `seq 10`
+        do
+		addrow+=("$intense") 
+                break
+        done
+done
+
+
+## Ask for activities that are a yes or no answer. If yes figure out the amount of time.
+for act in ${yntime_vars[@]}
+do
+	echo "Did you $act since your last entry today (enter numeric response then press [Enter])"
+	select yn in ${yn_array[@]}
+	do
+		case "$yn" in 
+			Yes) 	echo "At what time did you start $act-ing? (hh:mm : 24 hour format)"
+			  	read tbegin ; addrow+=("$tbegin")
+				echo "At what time did you end $act-ing? (hh:mm : 24 hour format)"
+				read tend ; addrow+=("$tend")
+				break;;
+			No)  	addrow+=("NA" "NA")
+				break;;
+			*)   	addrow+=("NA" "NA")
+				break;;
+		esac
+	done
+done
+
+### Factor Variables
+# Factor variables are not just yes or no answers, but rather have a list of possible answers. (For instance, beyond just exercising
+# what kind of exercising did you do?)
+## Exercise
+echo "Did you exercise since your last entry today?"
+select yn in ${yn_array[@]}
+do
+        if [ "$yn" = "Yes" ]; then
+                echo "What type?"
+                select exer in ${ex_list[@]}
+                do
+			addrow+=("$exer") ;
+			break
+                done
+                echo "How long? (in minutes)"
+		read tlength ; addrow+=("$tlength")
+                break
+        else
+		addrow+=("None" 0) ;  break
+        fi
+done
+
+
+## Dietary attributes
+# Water
+echo "Have you drank water since your last entry? (in Liters)"
+select yn in ${yn_array[@]}
+do
+        if [ "$yn" = "Yes" ]; then
+                echo "How much? (in Liters)"
+		read volume ; addrow+=("$volume")
+                break
+	else addrow+=(0) 
+                break
+        fi
+done
+
+
+# Food
+echo "Have you eaten since your last entry?"
+select yn in ${yn_array[@]}
+do
+        if [ "$yn" = "Yes" ] ; then
+                echo "What did you eat?"
+                select food in ${foods[@]}
+                do
+			addrow+=("$food")
+                        break
+                done
+                echo "How many servings?"
+		read serv ; addrow+=("$serv")
+                break
+        else
+		addrow+=("NA" 0)
+                break
+        fi
+done
+
+
+### Open ended questions
+# Here the user can input an event that happened that day
+echo "Did a different/unusual event happen since your last entry?"
+select yn in ${yn_array[@]}
+do
+        if [ "$yn" = "Yes" ] ; then
+                echo "Yes" ;
+                echo "What type?"
+                select event in ${events_array[@]}
+                do
+			addrow+=("$event")
+                        break
+                done; break
+        else
+		addrow+=(0)
+                break
+        fi
+done
+
+./background/colnames > data_folder/temp_file
+echo ${addrow[@]} >> data_folder/temp_file
+

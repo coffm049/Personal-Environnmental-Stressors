@@ -1,0 +1,24 @@
+# Project name: 	Environmental Stressors Survey
+# Purpose: 		To create a convenient way to collect data on every day activity and the overall effectiveness of it on a
+#			few metrics
+# Last Update: 		10/29/18 CC
+
+# Instructions:
+# Running the instructions file using the command './instruct' contains all of the information necessary for the program to run. 
+# The user will be prompted with a survey asking them about different features of the day and in the background will append these
+# to the growing data file.
+
+# Comprising files:
+# 1. Variables - Lists the different independent and dependent variables in arrays based on the type of data to be asked from them.
+# 2. Survey    - Uses the arrays held in Variables to create a survey and inputs those commands into Temp_file.
+# 3. Combiner  - Uses rbind() to concatenate the newest data to the bottom of old data.
+# 4. Cleaner   - Removes unnecessary quotations and row numbers that are a by product of using rbind().i
+# 5. Colnames  - generates the column names for the empty data.
+# 6. 
+
+# Current issues:
+# 1. Possibly not enough information taken from any of the given activities. Need more data to corraborate this
+# 2. Doesn't automatically prompt user to fill out survey upon starting computer.
+
+# Features: 
+# 1. Automatic survey generation and storage of data

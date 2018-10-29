@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Name:		Environmental Stressors/colnames
+# Purpose:	Generate column names to go along with the data generated from the survey script.
+# Updated:	2018/10/29 CC
+source background/variables
+
+# echo -n 2 ${dep_vars[@]} ${act_vars[@]} ${fac_vars[@]}
+yntimes=(`for i in ${yntime_vars[@]}; do for ((n=1; n<=2; n++)) do echo -n "$i$n ";done; done`)
+
+# echos the variables of the shape y/n time twice to account for a start and stop time and then manually creates columns for 
+# exercise food and water.
+echo Date_Time ${dep_vars[@]} ${yntimes[@]} "Exercise" "Ex_start" "Ex_stop" "Water" "Food" "servings"
